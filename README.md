@@ -1,3 +1,6 @@
+# karabiner
+替换 karabiner.json 到 ~/.config/karabiner/
+
 # iterm2
 ### 1. oh-my-zsh
 ```
