@@ -1,5 +1,27 @@
+
+
+# 配置 ssh key to GitHub
+gen a ssh key:
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+set key to Github:
+
+https://github.com/settings/keys
+
+拉取该项目到本地
+
+
 # karabiner
-替换 karabiner.json 到 ~/.config/karabiner/
+
+下载 karabiner：https://karabiner-elements.pqrs.org/
+
+替换 karabiner.json 到 `~/.config/karabiner/`
+
+# brew
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 # iterm2
 ### 1. oh-my-zsh
@@ -37,10 +59,7 @@ https://www.nerdfonts.com/font-downloads
 # 选择 Fira Mono font
 # item2 配置 text 里面选择字体 + 字体大小
 ```
-# brew
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+
 # neovim
 ### install
 ```
