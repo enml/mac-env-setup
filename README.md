@@ -24,18 +24,18 @@ https://github.com/settings/keys
 ```
 
 # iterm2
-### cp .zshrc to ~
+### 1. cp .zshrc to ~
 
-### 1. oh-my-zsh
+### 2. oh-my-zsh
 ```
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
-### 2. space-ship
+### 3. space-ship
 ```
 git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
 ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
 ```
-### 3. plugins
+### 4. plugins
 #### a. nvm
 ```
 git clone https://github.com/lukechilds/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
