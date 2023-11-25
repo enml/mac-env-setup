@@ -24,6 +24,8 @@ https://github.com/settings/keys
 ```
 
 # iterm2
+### cp .zshrc to ~
+
 ### 1. oh-my-zsh
 ```
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -72,12 +74,18 @@ brew install neovim
 git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 # 1. 进入 nvim，执行：PackerSync
  ```
+### install ripgrep
+
+https://github.com/BurntSushi/ripgrep#installation
+
 # tmux
 #### Install
 ```
 brew install tmux
 ```
 #### Update .tmux.conf
+copy .tmux.conf to ~/
+
 #### Tmux Plugin Manager
 ```
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
