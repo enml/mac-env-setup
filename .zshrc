@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/bytedance/.oh-my-zsh"
+export ZSH="/Users/helloworld/.oh-my-zsh"
 export PATH="/usr/local/opt/icu4c/bin:$PATH"
 export PATH="/usr/local/opt/icu4c/sbin:$PATH"
 export PATH=$PATH:~/Library/Python/2.7/bin
@@ -104,11 +104,9 @@ export LANG=en_US.UTF-8
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias cdcode="cd ~/Documents/code"
-alias vim=nvim
+alias cdcode="cd ~/Documents/Code"
+#alias vim=nvim
 alias vi=nvim
-alias sshdev="ssh chenjiawei.eric@10.227.84.117"
-
 
 set -o vi
 
