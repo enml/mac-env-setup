@@ -36,34 +36,6 @@ require('packer').startup(function(use)
   use {
     "folke/trouble.nvim",
     requires = "kyazdani42/nvim-web-devicons",
-    config = function()
-      require("trouble").setup {
-        {
-          position = "left", -- position of the list can be: bottom, top, left, right
-          action_keys = { -- key mappings for actions in the trouble list
-            -- map to {} to remove a mapping, for example:
-            -- close = {},
-            close = "q", -- close the list
-            cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
-            refresh = "r", -- manually refresh
-            jump = {"<cr>", "<tab>", "o"}, -- jump to the diagnostic or open / close folds
-            open_split = { "<c-x>" }, -- open buffer in new split
-            open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
-            open_tab = { "<c-t>" }, -- open buffer in new tab
-            jump_close = { "<c-o>" }, -- jump to the diagnostic and close the list
-            toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
-            toggle_preview = "P", -- toggle auto_preview
-            hover = "K", -- opens a small popup with the full multiline message
-            preview = "p", -- preview the diagnostic location
-            close_folds = {"zM", "zm"}, -- close all folds
-            open_folds = {"zR", "zr"}, -- open all folds
-            toggle_fold = {"zA", "za"}, -- toggle fold of current file
-            previous = "k", -- preview item
-            next = "j" -- next item
-        },
-        }
-      }
-    end
   }
   use 'folke/lsp-colors.nvim'
   -- UI --
@@ -71,7 +43,16 @@ require('packer').startup(function(use)
   use 'mjlbach/onedark.nvim' -- Theme inspired by Atom
   use 'nvim-lualine/lualine.nvim' -- Fancier statusline
   -- UI to select things (files, grep results, open buffers...)
-  use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } }
+  use {
+    'nvim-telescope/telescope.nvim',
+    requires = {
+      'nvim-lua/plenary.nvim',
+      { "nvim-telescope/telescope-live-grep-args.nvim" },
+    },
+    config = function()
+      require("telescope").load_extension("live_grep_args")
+    end
+  }
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   -- Nvim-tree
   use {
@@ -123,6 +104,34 @@ vim.cmd [[colorscheme onedark]]
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+
+-- Set trouble
+require("trouble").setup {
+    position = "left", -- position of the list can be: bottom, top, left, right
+    height = 100, -- height of the trouble list when position is top or bottom
+    width = 50,
+    action_keys = { -- key mappings for actions in the trouble list
+      -- map to {} to remove a mapping, for example:
+      -- close = {},
+      close = "q", -- close the list
+      cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
+      refresh = "r", -- manually refresh
+      jump = {"<cr>", "<tab>", "o"}, -- jump to the diagnostic or open / close folds
+      open_split = { "<c-x>" }, -- open buffer in new split
+      open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
+      open_tab = { "<c-t>" }, -- open buffer in new tab
+      jump_close = { "<c-o>" }, -- jump to the diagnostic and close the list
+      toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
+      toggle_preview = "P", -- toggle auto_preview
+      hover = "K", -- opens a small popup with the full multiline message
+      preview = "p", -- preview the diagnostic location
+      close_folds = {"zM", "zm"}, -- close all folds
+      open_folds = {"zR", "zr"}, -- open all folds
+      toggle_fold = {"zA", "za"}, -- toggle fold of current file
+      previous = "k", -- preview item
+      next = "j" -- next item
+    },
+}
 
 --Set statusbar
 require('lualine').setup {
@@ -191,6 +200,8 @@ map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>')
 map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>')
 
 -- LSP settings
+require("nvim-lsp-installer").setup {}
+
 local lspconfig = require 'lspconfig'
 local on_attach = function(_, bufnr)
   local opts = { noremap = true, silent = true }
@@ -208,7 +219,7 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>so', [[<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>]], opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
-  vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
+  vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.format({ bufnr = bufnr })]]
 end
 
 -- nvim-cmp supports additional completion capabilities
@@ -297,24 +308,9 @@ map('n', '<leader>n', '<cmd>NvimTreeFindFile<CR>')
 
 -- # NORMAL mode
 -- Linewise toggle current line using C-/
-map('n', '<C-_>', '<CMD>lua require("Comment.api").toggle_current_linewise()<CR>')
--- or with dot-repeat support
--- map('n', '<C-_>', '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$')
--- Blockwise toggle current line using C-\
-map('n', '<C-\\>', '<CMD>lua require("Comment.api").toggle_current_blockwise()<CR>')
--- or with dot-repeat support
--- map('n', '<C-\\>', '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$')
--- Linewise toggle multiple line using <leader>gc with dot-repeat support
--- Example: <leader>gc3j will comment 4 lines
-map('n', '<leader>gc', '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@')
--- Blockwise toggle multiple line using <leader>gc with dot-repeat support
--- Example: <leader>gb3j will comment 4 lines
-map('n', '<leader>gb', '<CMD>lua require("Comment.api").call("toggle_blockwise_op")<CR>g@')
--- # VISUAL mode
+map('n', '<C-_>', '<CMD>lua require("Comment.api").toggle.linewise()<CR>')
 -- Linewise toggle using C-/
-map('x', '<C-_>', '<ESC><CMD>lua require("Comment.api").toggle_linewise_op(vim.fn.visualmode())<CR>')
--- Blockwise toggle using <leader>gb
-map('x', '<leader>gb', '<ESC><CMD>lua require("Comment.api").toggle_blockwise_op(vim.fn.visualmode())<CR>')
+map('x', '<C-_>', '<ESC><CMD>lua require("Comment.api").toggle.blockwise(vim.fn.visualmode())<CR>')
 
 -- auto-pairs --
 require('nvim-autopairs').setup()
@@ -333,6 +329,7 @@ local actions = require("telescope.actions")
 local trouble = require("trouble.providers.telescope")
 
 local telescope = require("telescope")
+local lga_actions = require("telescope-live-grep-args.actions")
 
 telescope.setup {
   defaults = {
@@ -349,6 +346,22 @@ telescope.setup {
       },
     },
   },
+  extensions = {
+    live_grep_args = {
+      auto_quoting = true, -- enable/disable auto-quoting
+      -- define mappings, e.g.
+      mappings = { -- extend mappings
+        i = {
+          ["<C-k>"] = lga_actions.quote_prompt(),
+          ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+        },
+      },
+      -- ... also accepts theme settings, for example:
+      -- theme = "dropdown", -- use dropdown theme
+      -- theme = { }, -- use own theme spec
+      -- layout_config = { mirror=true }, -- mirror preview pane
+    }
+  }
 }
 --
 -- Enable telescope fzf native
@@ -361,7 +374,7 @@ map('n', '<leader>sb', [[<cmd>lua require('telescope.builtin').current_buffer_fu
 map('n', '<leader>sh', [[<cmd>lua require('telescope.builtin').help_tags()<CR>]])
 map('n', '<leader>st', [[<cmd>lua require('telescope.builtin').tags()<CR>]])
 map('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<CR>]])
-map('n', '<leader>f', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]])
+map('n', '<leader>f', [[<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>]])
 map('n', '<leader>so', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]])
 map('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]])
 
@@ -387,7 +400,7 @@ require("null-ls").setup({
                 buffer = bufnr,
                 callback = function()
                     -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
-                    vim.lsp.buf.formatting_sync()
+                    vim.lsp.buf.format({ bufnr = bufnr })
                 end,
             })
         end
