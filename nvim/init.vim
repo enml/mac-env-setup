@@ -1,6 +1,6 @@
 " Packer插件管理
 lua require('init')
-lua require('lsp/setup')
+"lua require('lsp/setup')
 
 " ============================================================================ "
 " ===                           EDITING OPTIONS                            === "

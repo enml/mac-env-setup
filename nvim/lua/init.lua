@@ -23,8 +23,9 @@ require('packer').startup(function(use)
   use 'wbthomason/packer.nvim' -- Package manager
   -- LSP --
   use {
-    'neovim/nvim-lspconfig',
-    'williamboman/nvim-lsp-installer',
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "neovim/nvim-lspconfig",
   }
   use "jose-elias-alvarez/null-ls.nvim"
   use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
@@ -200,7 +201,11 @@ map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>')
 map('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>')
 
 -- LSP settings
-require("nvim-lsp-installer").setup {}
+-- need keep order
+require("mason").setup()
+require("mason-lspconfig").setup {
+      ensure_installed = { "lua_ls", "tsserver", "markdown_oxide", "yamlls", "biome" },
+}
 
 local lspconfig = require 'lspconfig'
 local on_attach = function(_, bufnr)
@@ -326,7 +331,7 @@ map("n", "<leader>gr", "<cmd>Trouble lsp_references<cr>")
 
 -- telescope to trouble
 local actions = require("telescope.actions")
-local trouble = require("trouble.providers.telescope")
+local trouble = require("trouble.sources.telescope")
 
 local telescope = require("telescope")
 local lga_actions = require("telescope-live-grep-args.actions")
@@ -335,12 +340,12 @@ telescope.setup {
   defaults = {
     mappings = {
       i = { 
-        ["<c-t>"] = trouble.open_with_trouble,
+        ["<c-t>"] = trouble.open,
         ['<C-u>'] = false,
         ['<C-d>'] = false,
       },
       n = { 
-        ["<c-t>"] = trouble.open_with_trouble,
+        ["<c-t>"] = trouble.open,
         ['<C-u>'] = false,
         ['<C-d>'] = false,
       },
