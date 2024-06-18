@@ -74,6 +74,15 @@ brew install neovim
 git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 # 1. 进入 nvim，执行：PackerSync
  ```
+### LSP install
+```
+# 进入 nvim，执行：LspInstall
+
+ ```
+### install eslint
+```
+npm i eslint@8.57.0 -g
+ ```
 ### install ripgrep
 
 https://github.com/BurntSushi/ripgrep#installation
