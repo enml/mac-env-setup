@@ -18,10 +18,13 @@ https://github.com/settings/keys
 
 替换 karabiner.json 到 `~/.config/karabiner/`
 
+启动 karabiner 并给权限
+
 # brew
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
+按 log 提示添加 PATH
 
 # iterm2
 ### 1. cp .zshrc to ~
@@ -69,16 +72,19 @@ brew install neovim
 # 1. clone mac-env-setup repo
 # 2. cp to ~/.config/nvim/
 ```
+
+### 安装 nodes
+```
+nvm install 20.15.0
+nvm use 20.15.0
+```
+
 ### packer
 ```
 git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 # 1. 进入 nvim，执行：PackerSync
  ```
-### LSP install
-```
-# 进入 nvim，执行：LspInstall
 
- ```
 ### install eslint
 ```
 npm i eslint@8.57.0 -g
