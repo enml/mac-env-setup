@@ -18,13 +18,13 @@ https://github.com/settings/keys
 
 替换 karabiner.json 到 `~/.config/karabiner/`
 
-# 启动 karabiner 并给权限
+启动 karabiner 并给权限
 
 # brew
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-# 按 log 提示添加 PATH
+按 log 提示添加 PATH
 
 # iterm2
 ### 1. cp .zshrc to ~
