@@ -57,11 +57,10 @@ require('packer').startup(function(use)
   use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   -- Nvim-tree
   use {
-    'kyazdani42/nvim-tree.lua',
+    'nvim-tree/nvim-tree.lua',
     requires = {
-      'kyazdani42/nvim-web-devicons', -- optional, for file icon
+      'nvim-tree/nvim-web-devicons', -- optional
     },
-    tag = 'nightly', -- optional, updated every week. (see issue #1193)
   }
   -- Git --
   use 'tpope/vim-fugitive' -- Git commands in nvim
@@ -290,21 +289,17 @@ cmp.setup {
 
 -- nvim-tree --
 require'nvim-tree'.setup {
-  open_on_setup = false,
+  sort = {
+    sorter = "case_sensitive",
+  },
   view = {
-    width = 40,
-    side = "left",
-    preserve_window_proportions = true,
-    number = true,
-    relativenumber = false,
-    signcolumn = "yes",
-    mappings = {
-      custom_only = false,
-      list = {
-        -- user mappings go here
-        { key = {"<C-e>"}, action = "", mode = "n"},
-      },
-    },
+    width = 30,
+  },
+  renderer = {
+    group_empty = true,
+  },
+  filters = {
+    dotfiles = true,
   },
 }
 map('n', '<C-e>', '<cmd>NvimTreeToggle<CR>')
