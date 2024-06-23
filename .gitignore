@@ -1,0 +1,9 @@
+# misc
+.DS_Store
+.eslintcache
+
+# dependencies
+node_modules
+/.pnp
+.pnp.js
+

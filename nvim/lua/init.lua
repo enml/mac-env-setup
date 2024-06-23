@@ -1,79 +1,8 @@
 -- This file can be loaded by calling `lua require('plugins')` from your init.vim
--- Install packer
-local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
-
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-  vim.fn.execute('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
-end
 
 local function map(mode, lhs, rhs)
   vim.api.nvim_set_keymap(mode, lhs, rhs, { noremap = true, silent = true })
 end
-
--- configure Neovim to automatically run :PackerCompile whenever plugins.lua is updated
-vim.cmd([[
-augroup packer_user_config
-autocmd!
-autocmd BufWritePost plugins.lua source <afile> | PackerCompile
-augroup end
-]])
-
--- Plugins --
-require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim' -- Package manager
-  -- LSP --
-  use {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-    "neovim/nvim-lspconfig",
-  }
-  use "jose-elias-alvarez/null-ls.nvim"
-  use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
-  use 'hrsh7th/cmp-nvim-lsp' -- LSP source for nvim-cmp
-  use 'saadparwaiz1/cmp_luasnip' -- Snippets source for nvim-cmp
-  use 'L3MON4D3/LuaSnip' -- Snippets plugin
-  use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
-  use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
-  use {
-    "folke/trouble.nvim",
-    requires = "kyazdani42/nvim-web-devicons",
-  }
-  use 'folke/lsp-colors.nvim'
-  -- UI --
-  use 'arcticicestudio/nord-vim' -- color
-  use 'mjlbach/onedark.nvim' -- Theme inspired by Atom
-  use 'nvim-lualine/lualine.nvim' -- Fancier statusline
-  -- UI to select things (files, grep results, open buffers...)
-  use {
-    'nvim-telescope/telescope.nvim',
-    requires = {
-      'nvim-lua/plenary.nvim',
-      { "nvim-telescope/telescope-live-grep-args.nvim" },
-    },
-    config = function()
-      require("telescope").load_extension("live_grep_args")
-    end
-  }
-  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
-  -- Nvim-tree
-  use {
-    'nvim-tree/nvim-tree.lua',
-    requires = {
-      'nvim-tree/nvim-web-devicons', -- optional
-    },
-  }
-  -- Git --
-  use 'tpope/vim-fugitive' -- Git commands in nvim
-  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' } -- git diff view
-  use { 'lewis6991/gitsigns.nvim', requires = { 'nvim-lua/plenary.nvim' } }  -- Add git related info in the signs columns and popups
-  -- auto-pairs
-  use 'windwp/nvim-autopairs'
-  --
-  use {
-    'nvim-treesitter/nvim-treesitter',
-    run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
-  }
-end)
 
 --Make line numbers default
 vim.wo.number = true
@@ -411,3 +340,15 @@ require("null-ls").setup({
 --
 map("n", "<leader>cp", "<cmd>let @+=expand('%')<cr>") --copy current file path
 map("n", "<leader>gb", "<cmd>Git blame<cr>") -- git blame
+
+---
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}

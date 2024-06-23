@@ -116,4 +116,6 @@ tmux source ~/.tmux.conf
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 ```
 
-
+# Raycast
+1. install Raycast
+2. open the Raycase.xx.rayconfig and import
