@@ -37,30 +37,10 @@ vim.o.completeopt = 'menuone,noselect'
 
 -- Set trouble
 require("trouble").setup {
-    position = "left", -- position of the list can be: bottom, top, left, right
-    height = 100, -- height of the trouble list when position is top or bottom
-    width = 50,
-    action_keys = { -- key mappings for actions in the trouble list
-      -- map to {} to remove a mapping, for example:
-      -- close = {},
-      close = "q", -- close the list
-      cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
-      refresh = "r", -- manually refresh
-      jump = {"<cr>", "<tab>", "o"}, -- jump to the diagnostic or open / close folds
-      open_split = { "<c-x>" }, -- open buffer in new split
-      open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
-      open_tab = { "<c-t>" }, -- open buffer in new tab
-      jump_close = { "<c-o>" }, -- jump to the diagnostic and close the list
-      toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
-      toggle_preview = "P", -- toggle auto_preview
-      hover = "K", -- opens a small popup with the full multiline message
-      preview = "p", -- preview the diagnostic location
-      close_folds = {"zM", "zm"}, -- close all folds
-      open_folds = {"zR", "zr"}, -- open all folds
-      toggle_fold = {"zA", "za"}, -- toggle fold of current file
-      previous = "k", -- preview item
-      next = "j" -- next item
-    },
+  win = {
+    position = "left",
+    width = 50
+  }
 }
 
 --Set statusbar
@@ -222,14 +202,26 @@ require'nvim-tree'.setup {
     sorter = "case_sensitive",
   },
   view = {
-    width = 30,
+    width = 40,
   },
   renderer = {
     group_empty = true,
   },
   filters = {
-    dotfiles = true,
+    dotfiles = false,
+    git_ignored = true,
   },
+  git = {
+    enable = true,
+  },
+  diagnostics = {
+    enable = true,
+  },
+  update_focused_file = {
+    update_root = true
+  },
+  sync_root_with_cwd = true,
+  respect_buf_cwd = true,
 }
 map('n', '<C-e>', '<cmd>NvimTreeToggle<CR>')
 map('n', '<leader>n', '<cmd>NvimTreeFindFile<CR>')
@@ -256,44 +248,20 @@ map("n", "<leader>gr", "<cmd>Trouble lsp_references<cr>")
 
 -- telescope to trouble
 local actions = require("telescope.actions")
-local trouble = require("trouble.sources.telescope")
+local open_with_trouble = require("trouble.sources.telescope").open
+local add_to_trouble = require("trouble.sources.telescope").add
 
 local telescope = require("telescope")
-local lga_actions = require("telescope-live-grep-args.actions")
 
-telescope.setup {
+telescope.setup({
   defaults = {
     mappings = {
-      i = { 
-        ["<c-t>"] = trouble.open,
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-      n = { 
-        ["<c-t>"] = trouble.open,
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
+      i = { ["<c-t>"] = open_with_trouble },
+      n = { ["<c-t>"] = open_with_trouble },
     },
   },
-  extensions = {
-    live_grep_args = {
-      auto_quoting = true, -- enable/disable auto-quoting
-      -- define mappings, e.g.
-      mappings = { -- extend mappings
-        i = {
-          ["<C-k>"] = lga_actions.quote_prompt(),
-          ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
-        },
-      },
-      -- ... also accepts theme settings, for example:
-      -- theme = "dropdown", -- use dropdown theme
-      -- theme = { }, -- use own theme spec
-      -- layout_config = { mirror=true }, -- mirror preview pane
-    }
-  }
-}
---
+})
+
 -- Enable telescope fzf native
 require('telescope').load_extension 'fzf'
 
@@ -341,14 +309,15 @@ require("null-ls").setup({
 map("n", "<leader>cp", "<cmd>let @+=expand('%')<cr>") --copy current file path
 map("n", "<leader>gb", "<cmd>Git blame<cr>") -- git blame
 
----
+--
 require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "query" },
+  sync_install = false,
+  auto_install = true,
+  ignore_install = { "javascript" },
   highlight = {
     enable = true,
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
+    disable = { "c", "rust" },
     additional_vim_regex_highlighting = false,
   },
 }
