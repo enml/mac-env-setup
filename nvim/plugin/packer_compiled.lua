@@ -209,6 +209,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/eric/.local/share/nvim/site/pack/packer/start/vim-fugitive",
     url = "https://github.com/tpope/vim-fugitive"
+  },
+  ["vim-styled-components"] = {
+    loaded = true,
+    path = "/Users/eric/.local/share/nvim/site/pack/packer/start/vim-styled-components",
+    url = "https://github.com/styled-components/vim-styled-components"
   }
 }
 
