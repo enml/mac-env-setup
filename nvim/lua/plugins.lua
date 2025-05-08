@@ -35,7 +35,12 @@ return require("packer").startup({
 				"williamboman/mason.nvim",
 			},
 		})
-		use("jose-elias-alvarez/null-ls.nvim")
+                use({
+                  "nvimtools/none-ls.nvim",
+                  requires = {
+                    "nvimtools/none-ls-extras.nvim"
+                  }
+                })
 		use("hrsh7th/nvim-cmp") -- Autocompletion plugin
 		use("hrsh7th/cmp-nvim-lsp") -- LSP source for nvim-cmp
 		use("saadparwaiz1/cmp_luasnip") -- Snippets source for nvim-cmp
