@@ -35,11 +35,37 @@ vim.cmd([[colorscheme onedark]])
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 
+--fold
+vim.o.foldcolumn = "0" -- '0' is not bad
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+-- need keep order
+require("mason").setup()
+
+require("ufo").setup()
+
 -- Set trouble
 require("trouble").setup({
 	win = {
 		position = "left",
-		width = 50,
+		width = 150,
+	},
+	modes = {
+		mydiags = {
+			mode = "diagnostics",
+			filter = {
+				any = {
+					{
+						severity = vim.diagnostic.severity.ERROR, -- errors only
+						function(item)
+							return item.filename:find((vim.loop or vim.uv).cwd(), 1, true)
+						end,
+					},
+				},
+			},
+		},
 	},
 })
 
@@ -110,10 +136,8 @@ map("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>")
 map("n", "<leader>q", "<cmd>lua vim.diagnostic.setloclist()<CR>")
 
 -- LSP settings
--- need keep order
-require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "tsserver", "markdown_oxide", "yamlls", "biome" },
+	ensure_installed = { "lua_ls", "ts_ls", "markdown_oxide", "yamlls", "biome" },
 })
 
 local lspconfig = require("lspconfig")
@@ -150,10 +174,14 @@ end
 
 -- nvim-cmp supports additional completion capabilities
 local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.foldingRange = {
+	dynamicRegistration = false,
+	lineFoldingOnly = true,
+}
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 -- Enable the following language servers
-local servers = { "tsserver" }
+local servers = { "ts_ls" }
 for _, lsp in ipairs(servers) do
 	lspconfig[lsp].setup({
 		on_attach = on_attach,
@@ -269,8 +297,8 @@ require("nvim-autopairs").setup()
 -- trouble.nvim --
 -- Lua
 map("n", "<leader>xx", "<cmd>Trouble<cr>")
-map("n", "<leader>xw", "<cmd>Trouble workspace_diagnostics<cr>")
-map("n", "<leader>xd", "<cmd>Trouble document_diagnostics<cr>")
+map("n", "<leader>xw", "<cmd>Trouble diagnostics<cr>")
+map("n", "<leader>xd", "<cmd>Trouble diagnostics document symbols<cr>")
 map("n", "<leader>xl", "<cmd>Trouble loclist<cr>")
 map("n", "<leader>xq", "<cmd>Trouble quickfix<cr>")
 map("n", "<leader>gr", "<cmd>Trouble lsp_references<cr>")
@@ -285,8 +313,16 @@ local telescope = require("telescope")
 telescope.setup({
 	defaults = {
 		mappings = {
-			i = { ["<c-t>"] = open_with_trouble },
-			n = { ["<c-t>"] = open_with_trouble },
+			i = {
+				["<c-t>"] = open_with_trouble,
+				["<C-s>"] = actions.select_horizontal, -- Open in horizontal split
+				["<C-v>"] = actions.select_vertical, -- Open in vertical split
+			},
+			n = {
+				["<c-t>"] = open_with_trouble,
+				["<C-s>"] = actions.select_horizontal, -- Open in horizontal split
+				["<C-v>"] = actions.select_vertical, -- Open in vertical split
+			},
 		},
 	},
 })
@@ -347,7 +383,7 @@ map("n", "<leader>gb", "<cmd>Git blame<cr>") -- git blame
 
 --
 require("nvim-treesitter.configs").setup({
-	ensure_installed = { "c", "lua", "vim", "vimdoc", "query" },
+	ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "tact" },
 	sync_install = false,
 	auto_install = true,
 	ignore_install = { "javascript" },
@@ -355,5 +391,12 @@ require("nvim-treesitter.configs").setup({
 		enable = true,
 		disable = { "c", "rust" },
 		additional_vim_regex_highlighting = false,
+	},
+})
+
+---
+vim.filetype.add({
+	extension = {
+		tact = "tact",
 	},
 })
