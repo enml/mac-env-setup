@@ -136,15 +136,33 @@ map("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>")
 map("n", "<leader>q", "<cmd>lua vim.diagnostic.setloclist()<CR>")
 
 -- LSP settings
+-- mason-lspconfig expects `mason-registry.refresh(cb)` to call `cb(success, updated_registries)`.
+-- Older mason.nvim versions call `cb(success, result)` where `result` is nil, which breaks mason-lspconfig.
+-- Shim the callback signature to avoid startup errors; best fix is updating mason.nvim + mason-lspconfig.nvim together.
+do
+	local ok, registry = pcall(require, "mason-registry")
+	if ok and type(registry.refresh) == "function" then
+		local refresh = registry.refresh
+		registry.refresh = function(cb)
+			if type(cb) ~= "function" then
+				return refresh(cb)
+			end
+			return refresh(function(success, _result)
+				cb(success, {})
+			end)
+		end
+	end
+end
+
 require("mason-lspconfig").setup({
 	ensure_installed = { "lua_ls", "ts_ls", "markdown_oxide", "yamlls", "biome" },
 })
 
-local lspconfig = require("lspconfig")
 local on_attach = function(_, bufnr)
 	local opts = { noremap = true, silent = true }
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, { noremap = true, silent = true })
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
@@ -158,7 +176,8 @@ local on_attach = function(_, bufnr)
 		opts
 	)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { noremap = true, silent = true })
 	-- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(
@@ -168,8 +187,19 @@ local on_attach = function(_, bufnr)
 		[[<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>]],
 		opts
 	)
-	vim.cmd([[ command! Format execute 'lua vim.lsp.buf.formatting()' ]])
-	vim.cmd([[autocmd BufWritePre <buffer> lua vim.lsp.buf.format({ bufnr = bufnr })]])
+
+	vim.api.nvim_buf_create_user_command(bufnr, "Format", function()
+		vim.lsp.buf.format({ bufnr = bufnr })
+	end, {})
+
+	local format_group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, { clear = true })
+	vim.api.nvim_create_autocmd("BufWritePre", {
+		group = format_group,
+		buffer = bufnr,
+		callback = function()
+			vim.lsp.buf.format({ bufnr = bufnr })
+		end,
+	})
 end
 
 -- nvim-cmp supports additional completion capabilities
@@ -183,10 +213,11 @@ capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 -- Enable the following language servers
 local servers = { "ts_ls" }
 for _, lsp in ipairs(servers) do
-	lspconfig[lsp].setup({
+	vim.lsp.config(lsp, {
 		on_attach = on_attach,
 		capabilities = capabilities,
 	})
+	vim.lsp.enable(lsp)
 end
 
 -- luasnip setup --
@@ -360,6 +391,7 @@ require("null-ls").setup({
 					".prettierrc.js",
 				})
 			end,
+			extra_args = { "--use-tabs=false", "--tab-width=2" },
 		}),
 	},
 	-- you can reuse a shared lspconfig on_attach callback here
