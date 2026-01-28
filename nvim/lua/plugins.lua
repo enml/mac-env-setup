@@ -35,12 +35,12 @@ return require("packer").startup({
 				"williamboman/mason.nvim",
 			},
 		})
-                use({
-                  "nvimtools/none-ls.nvim",
-                  requires = {
-                    "nvimtools/none-ls-extras.nvim"
-                  }
-                })
+		use({
+			"nvimtools/none-ls.nvim",
+			requires = {
+				"nvimtools/none-ls-extras.nvim",
+			},
+		})
 		use("hrsh7th/nvim-cmp") -- Autocompletion plugin
 		use("hrsh7th/cmp-nvim-lsp") -- LSP source for nvim-cmp
 		use("saadparwaiz1/cmp_luasnip") -- Snippets source for nvim-cmp
@@ -113,7 +113,7 @@ return require("packer").startup({
 		end
 	end,
 	config = {
-		snapshot = v1, -- Name of the snapshot you would like to load at startup
+		snapshot = "stable.jan.27", -- Snapshot file in repo root
 		snapshot_path = "./",
 	},
 })

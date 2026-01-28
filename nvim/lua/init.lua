@@ -140,6 +140,20 @@ map("n", "<leader>q", "<cmd>lua vim.diagnostic.setloclist()<CR>")
 -- Older mason.nvim versions call `cb(success, result)` where `result` is nil, which breaks mason-lspconfig.
 -- Shim the callback signature to avoid startup errors; best fix is updating mason.nvim + mason-lspconfig.nvim together.
 do
+	-- Ensure mason is initialized before mason-lspconfig, and make sure mason-installed
+	-- executables (like `typescript-language-server`) are on PATH.
+	local mason_ok = pcall(require, "mason")
+	if mason_ok then
+		require("mason").setup()
+		local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+		if vim.fn.isdirectory(mason_bin) == 1 then
+			local path = vim.env.PATH or ""
+			if not string.find(path, mason_bin, 1, true) then
+				vim.env.PATH = mason_bin .. ":" .. path
+			end
+		end
+	end
+
 	local ok, registry = pcall(require, "mason-registry")
 	if ok and type(registry.refresh) == "function" then
 		local refresh = registry.refresh
@@ -162,7 +176,7 @@ local on_attach = function(_, bufnr)
 	local opts = { noremap = true, silent = true }
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
 	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, { noremap = true, silent = true })
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, { noremap = true, silent = true, buffer = bufnr })
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
@@ -177,7 +191,7 @@ local on_attach = function(_, bufnr)
 	)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
 	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { noremap = true, silent = true })
+	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { noremap = true, silent = true, buffer = bufnr })
 	-- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 	vim.api.nvim_buf_set_keymap(
@@ -210,12 +224,12 @@ capabilities.textDocument.foldingRange = {
 }
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
--- Enable the following language servers
-local servers = { "ts_ls" }
-for _, lsp in ipairs(servers) do
-	vim.lsp.config(lsp, {
-		on_attach = on_attach,
-		capabilities = capabilities,
+	-- Enable the following language servers
+	local servers = { "lua_ls", "ts_ls", "markdown_oxide", "yamlls", "biome" }
+	for _, lsp in ipairs(servers) do
+		vim.lsp.config(lsp, {
+			on_attach = on_attach,
+			capabilities = capabilities,
 	})
 	vim.lsp.enable(lsp)
 end
@@ -372,43 +386,59 @@ map("n", "<leader>f", [[<cmd>lua require('telescope').extensions.live_grep_args.
 map("n", "<leader>so", [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]])
 map("n", "<leader>?", [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]])
 
--- null-ls
--- null-ls format on save
-local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-local null_ls = require("null-ls")
-require("null-ls").setup({
-	sources = {
-		null_ls.builtins.formatting.stylua,
-		-- null_ls.builtins.diagnostics.eslint,
-		null_ls.builtins.completion.spell,
-		require("none-ls.diagnostics.eslint"), -- requires none-ls-extras.nvim
-		null_ls.builtins.formatting.prettier.with({
-			-- (Optional) Only use Prettier if a config file is found
-			condition = function(utils)
-				return utils.root_has_file({
-					".prettierrc",
-					".prettierrc.json",
-					".prettierrc.js",
-				})
-			end,
-			extra_args = { "--use-tabs=false", "--tab-width=2" },
-		}),
-	},
-	-- you can reuse a shared lspconfig on_attach callback here
-	on_attach = function(client, bufnr)
-		if client.supports_method("textDocument/formatting") then
-			vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				group = augroup,
-				buffer = bufnr,
-				callback = function()
-					-- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
-					vim.lsp.buf.format({ bufnr = bufnr })
-				end,
-			})
+-- none-ls (formerly null-ls)
+-- Note: this is not a mason-lspconfig server, so `:LspStart null-ls` will fail with "invalid server name".
+do
+	local ok, null_ls = pcall(require, "null-ls")
+	if ok then
+		local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+		local eslint_source
+		do
+			local eslint_ok, eslint = pcall(require, "none-ls.diagnostics.eslint") -- from none-ls-extras.nvim
+			if eslint_ok then
+				eslint_source = eslint
+			elseif null_ls.builtins and null_ls.builtins.diagnostics and null_ls.builtins.diagnostics.eslint then
+				eslint_source = null_ls.builtins.diagnostics.eslint
+			end
 		end
-	end,
-})
+
+		local sources = {
+			null_ls.builtins.formatting.stylua,
+			null_ls.builtins.completion.spell,
+			null_ls.builtins.formatting.prettier.with({
+				-- Only use Prettier if a config file is found
+				condition = function(utils)
+					return utils.root_has_file({
+						".prettierrc",
+						".prettierrc.json",
+						".prettierrc.js",
+					})
+				end,
+				extra_args = { "--use-tabs=false", "--tab-width=2" },
+			}),
+		}
+		if eslint_source then
+			table.insert(sources, eslint_source)
+		end
+
+		null_ls.setup({
+			sources = sources,
+			on_attach = function(client, bufnr)
+				if client.supports_method("textDocument/formatting") then
+					vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						group = augroup,
+						buffer = bufnr,
+						callback = function()
+							vim.lsp.buf.format({ bufnr = bufnr })
+						end,
+					})
+				end
+			end,
+		})
+	end
+end
 
 --
 map("n", "<leader>cp", "<cmd>let @+=expand('%')<cr>") --copy current file path
