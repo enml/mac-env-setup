@@ -1,4 +1,13 @@
+# mac-env-setup
 
+个人 Mac 环境配置备份，换机时用来一键复原。
+
+> **维护约定**：任何新的系统级配置（Karabiner 键位、tmux/zsh/nvim 配置、brew 包、
+> 系统偏好、快捷键、输入法等）都记录到本仓库——配置文件直接同步进来（如 `karabiner.json`、
+> `.tmux.conf`、`.zshrc`），并在 README 对应小节补一句说明。目标是：新 Mac 上照 README
+> 走一遍就能完整复原。
+
+---
 
 # 配置 ssh key to GitHub
 gen a ssh key:
@@ -15,10 +24,16 @@ https://github.com/settings/keys
 # karabiner
 
 下载 karabiner：https://karabiner-elements.pqrs.org/
+（或 `brew install --cask karabiner-elements`）
 
 替换 karabiner.json 到 `~/.config/karabiner/`
 
-启动 karabiner 并给权限
+启动 karabiner 并给权限（Driver Extension + Input Monitoring）
+
+当前启用的 complex modifications（都在 karabiner.json 里）：
+- **Map Ctrl-[ to Esc**
+- **Left option + hjkl → 方向键（Vim 风格）**
+- **tmux prefix: Ctrl+B 在中文输入法下也生效** —— 按 Ctrl+B 时先切到英文输入源（ABC）再把 Ctrl+B 放行，避免中文输入法吞掉 tmux 前缀键。若英文源不是 ABC，改 `input_source_id`（如 `com.apple.keylayout.US`）。
 
 # brew
 ```
