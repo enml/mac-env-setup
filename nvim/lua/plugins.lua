@@ -84,6 +84,8 @@ return require("packer").startup({
 		--
 		use({
 			"nvim-treesitter/nvim-treesitter",
+			-- main 分支已重写并移除了 nvim-treesitter.configs；锁定旧的 master 分支以兼容 init.lua
+			branch = "master",
 			run = function()
 				local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
 				ts_update()

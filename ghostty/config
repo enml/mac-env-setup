@@ -1,0 +1,4 @@
+font-family = FiraMono Nerd Font Mono
+font-size = 14
+# 让 Option 键作为 Alt 使用（zsh vi 模式 / nvim / tmux 快捷键需要）
+macos-option-as-alt = true

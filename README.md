@@ -1,121 +1,48 @@
+# mac-env-setup
 
+Apple Silicon Mac 开发环境：zsh (oh-my-zsh + spaceship) · Ghostty · tmux · Neovim · Node (nvm) · Karabiner · Raycast · Chrome
 
-# 配置 ssh key to GitHub
-gen a ssh key:
+## 一键安装
 
-https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+### 1. Homebrew（需要输入密码，会顺带装 Xcode Command Line Tools）
 
-set key to Github:
+如果在国内且用 Clash 等代理，先在当前终端开代理，否则下载 GitHub 会失败：
 
-https://github.com/settings/keys
-
-拉取该项目到本地
-
-
-# karabiner
-
-下载 karabiner：https://karabiner-elements.pqrs.org/
-
-替换 karabiner.json 到 `~/.config/karabiner/`
-
-启动 karabiner 并给权限
-
-# brew
 ```
+export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-按 log 提示添加 PATH
 
-# iterm2
-### 1. cp .zshrc to ~
+### 2. 拉取本 repo 并执行安装脚本
 
-### 2. oh-my-zsh
 ```
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-### 3. space-ship
-```
-git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
-ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
-```
-### 4. plugins
-#### a. nvm
-```
-git clone https://github.com/lukechilds/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
-```
-#### b. fzf
-```
-brew install fzf
-
-# To install useful key bindings and fuzzy completion:
-$(brew --prefix)/opt/fzf/install
-```
-#### c. zsh-autosuggestions
-```
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-```
-#### d. zsh-syntax-highlighting.git 
-```
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
-### 4. font
-```
-https://www.nerdfonts.com/font-downloads
-# 选择 Fira Mono font
-# item2 配置 text 里面选择字体 + 字体大小
+eval "$(/opt/homebrew/bin/brew shellenv)"
+mkdir -p ~/Documents/Code && cd ~/Documents/Code
+git clone https://github.com/enml/mac-env-setup.git && cd mac-env-setup
+./install.sh
 ```
 
-# neovim
-### install
-```
-brew install neovim
-# 1. clone mac-env-setup repo
-# 2. cp to ~/.config/nvim/
-```
+脚本可以重复执行，已经装好的会跳过；被覆盖的配置文件会先备份成 `*.bak.<时间>`。它会：
 
-### 安装 nodes
-```
-nvm install 20.15.0
-nvm use 20.15.0
-```
+- `brew bundle` 安装 [Brewfile](Brewfile) 里的工具、应用和字体（Karabiner 安装时需要密码）
+- 安装 oh-my-zsh、spaceship 主题、zsh-nvm / zsh-autosuggestions / zsh-syntax-highlighting 插件，fzf 快捷键
+- 放置 `.zshrc`、`.zprofile`、`.tmux.conf`、`ghostty/config`、`karabiner.json`、`nvim/`
+- nvm + Node 20.15.0（默认），全局 `eslint@8.57.0`、`prettier`
+- tpm 及 tmux 插件
+- packer + `PackerSync`，Mason 安装 LSP（lua / ts / markdown / yaml / biome）
+- macOS：Caps Lock 切换中英文输入法
 
-### packer
-```
-git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-# 1. 进入 nvim，执行：PackerSync
- ```
+### 3. 手动步骤
 
-### install eslint
-```
-npm i eslint@8.57.0 -g
- ```
-### install ripgrep
+1. **Karabiner**：打开 Karabiner-Elements，按提示在系统设置里允许驱动扩展和「输入监控」
+2. **Raycast**：打开 Raycast，导入 repo 里的 `.rayconfig`
+3. **Safari**：设置 → 搜索 → 搜索引擎选 Google（Safari 有沙盒，脚本改不了）
+4. **SSH key**：按 [GitHub 文档](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) 生成，添加到 https://github.com/settings/keys
+5. 退出当前终端，之后用 **Ghostty**
 
-https://github.com/BurntSushi/ripgrep#installation
+## 说明
 
-# tmux
-#### Install
-```
-brew install tmux
-```
-#### Update .tmux.conf
-copy .tmux.conf to ~/
-
-#### Tmux Plugin Manager
-```
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-```
-#### Reload
-```
-tmux source ~/.tmux.conf
-```
-
-# node
-### nvm
-```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-```
-
-# Raycast
-1. install Raycast
-2. open the Raycase.xx.rayconfig and import
+- **代理**：`.zshrc` 里 Clash 端口（7897）开着时自动 `proxy_on`；`proxy_off` 关闭
+- **Karabiner 规则**：`Ctrl-[` → Esc；左 Ctrl + hjkl → 方向键；外接键盘（旧键盘和 Akko Mu02）交换左 Command / Option
+- **tmux**：prefix + `s`/`v` 分屏，`h/j/k/l` 切换 pane，`R` 重新加载配置
+- **nvim-treesitter** 锁定在 `master` 分支：`main` 分支重写后删掉了 `init.lua` 依赖的 `nvim-treesitter.configs`
