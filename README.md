@@ -30,7 +30,7 @@ git clone https://github.com/enml/mac-env-setup.git && cd mac-env-setup
 - nvm + Node 20.15.0（默认），全局 `eslint@8.57.0`、`prettier`
 - tpm 及 tmux 插件
 - packer + `PackerSync`，Mason 安装 LSP（lua / ts / markdown / yaml / biome）
-- macOS：Caps Lock 切换中英文输入法
+- macOS：关闭系统自带的 Caps Lock 切换 ABC（改由 Karabiner 处理，见下方）
 
 ### 3. 手动步骤
 
@@ -43,6 +43,6 @@ git clone https://github.com/enml/mac-env-setup.git && cd mac-env-setup
 ## 说明
 
 - **代理**：`.zshrc` 里 Clash 端口（7897）开着时自动 `proxy_on`；`proxy_off` 关闭
-- **Karabiner 规则**：`Ctrl-[` → Esc；左 Ctrl + hjkl → 方向键；外接键盘（旧键盘和 Akko Mu02）交换左 Command / Option
+- **Karabiner 规则**：Caps Lock 轻按 = 切换输入法（Ctrl+Space），按住 = Control；`Ctrl-[` → Esc；左 Ctrl + hjkl → 方向键；外接键盘（旧键盘和 Akko Mu02）交换左 Command / Option
 - **tmux**：prefix + `s`/`v` 分屏，`h/j/k/l` 切换 pane，`R` 重新加载配置
 - **nvim-treesitter** 锁定在 `master` 分支：`main` 分支重写后删掉了 `init.lua` 依赖的 `nvim-treesitter.configs`

@@ -71,8 +71,9 @@ install_file "$REPO/karabiner.json" "$HOME/.config/karabiner/karabiner.json"
 
 # ---------------------------------------------------------------- macOS 设置
 step "macOS 设置"
-# 用 Caps Lock 在 ABC 和中文输入法之间切换（等同系统设置 → 键盘 → 输入法里的开关）
-defaults write com.apple.HIToolbox TISRomanSwitchState -int 1
+# Caps Lock 由 Karabiner 接管（轻按 = Ctrl+Space 切换输入法，按住 = Control），
+# 关掉系统自带的「Caps Lock 切换 ABC」，避免冲突
+defaults write com.apple.HIToolbox TISRomanSwitchState -int 0
 
 # ---------------------------------------------------------------- Neovim
 step "Neovim 配置 + 插件 + LSP"
