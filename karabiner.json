@@ -4,6 +4,34 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "tmux prefix (Ctrl+b) in Ghostty: switch input source to ABC first",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": ["^com\\.mitchellh\\.ghostty$"],
+                                        "type": "frontmost_application_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "b",
+                                    "modifiers": {
+                                        "mandatory": ["control"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [
+                                    { "select_input_source": { "input_source_id": "^com\\.apple\\.keylayout\\.ABC$" } },
+                                    {
+                                        "key_code": "b",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Caps Lock: tap = switch input source (Ctrl+Space), hold = Left Control",
                         "manipulators": [
                             {

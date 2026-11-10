@@ -43,6 +43,6 @@ git clone https://github.com/enml/mac-env-setup.git && cd mac-env-setup
 ## 说明
 
 - **代理**：`.zshrc` 里 Clash 端口（7897）开着时自动 `proxy_on`；`proxy_off` 关闭
-- **Karabiner 规则**：Caps Lock 轻按 = 切换输入法（Ctrl+Space），按住 = Control；`Ctrl-[` → Esc；左 Ctrl + hjkl → 方向键；外接键盘（旧键盘和 Akko Mu02）交换左 Command / Option
+- **Karabiner 规则**：Caps Lock 轻按 = 切换输入法（Ctrl+Space），按住 = Control；`Ctrl-[` → Esc；左 Ctrl + hjkl → 方向键；外接键盘（旧键盘和 Akko Mu02）交换左 Command / Option；在 Ghostty 里按 tmux prefix（Ctrl+b）会先切到 ABC 英文输入法
 - **tmux**：prefix + `s`/`v` 分屏，`h/j/k/l` 切换 pane，`R` 重新加载配置
 - **nvim-treesitter** 锁定在 `master` 分支：`main` 分支重写后删掉了 `init.lua` 依赖的 `nvim-treesitter.configs`
