@@ -1,6 +1,6 @@
 font-family = FiraMono Nerd Font Mono
 # 正文用 Bold 字重（可选 Regular / Medium / Bold）
 font-style = Bold
-font-size = 14
+font-size = 16
 # 让 Option 键作为 Alt 使用（zsh vi 模式 / nvim / tmux 快捷键需要）
 macos-option-as-alt = true
